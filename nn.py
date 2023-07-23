@@ -1,6 +1,8 @@
 import csv
+
 import numpy as np
-import mlp.layer
+
+import layer
 
 
 class NetWork:
@@ -32,8 +34,8 @@ class NetWork:
 
     def backward(self):
         dout = self.loss_layer.backward()
-        for layer in reversed(self.layers):
-            dout = layer.backward(dout)
+        for lay in reversed(self.layers):
+            dout = lay.backward(dout)
         return dout
 
     def iteration(self, feature, label):
@@ -67,12 +69,12 @@ class TwoLayerNet(NetWork):
         super().__init__(input_size, hidden_size, output_size)
         w1, b1, w2, b2 = self.init()
         self.layers = [
-            mlp.layer.Affine(w1, b1),
-            mlp.layer.ReLU(),
-            mlp.layer.Affine(w2, b2)
+            layer.Affine(w1, b1),
+            layer.ReLU(),
+            layer.Affine(w2, b2)
         ]
         self.load_params()
-        self.loss_layer = mlp.layer.Mse()
+        self.loss_layer = layer.Mse()
 
     def init(self):
         # 初始化权重和偏置
@@ -144,7 +146,7 @@ class DataLoader:
 
 
 def save_model(model, params_filepath):
-    with open(params_filepath, 'w') as f_main:
+    with open(params_filepath, 'w') as f:
         for i in range(0, len(model.params), 2):
             weight = model.params[i]
             bias = model.params[i+1]
@@ -161,7 +163,6 @@ def load(model, params_filepath):
             raw_data.append(row)
     # load layer shapes first
     layers_shape = []
-    layer_num = int(len(model.params) / 2)
     for i in range(len(model.params)):
         layers_shape.append(np.shape(model.params[i]))
     # load layers
@@ -169,10 +170,10 @@ def load(model, params_filepath):
     row_index = 0
     for i in range(0, len(layers_shape), 2):
         shape = layers_shape[i]
-        layer = []
+        lay = []
         for j in range(row_index, row_index+shape[0]+1):
-            layer.append(raw_data[j])
-        layers.append(np.array(layer, dtype=np.float32))
+            lay.append(raw_data[j])
+        layers.append(np.array(lay, dtype=np.float32))
         row_index += shape[0]+1
     # load params
     params = []
@@ -199,4 +200,3 @@ def example():
 
 if __name__ == '__main__':
     example()
-

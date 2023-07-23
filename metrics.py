@@ -1,4 +1,6 @@
 import numpy
 
+
 class AUC:
-    pass
+    def __init__(self, feature):
+        pass
