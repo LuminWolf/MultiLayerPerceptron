@@ -2,19 +2,21 @@ import csv
 
 import numpy as np
 
-import layer
+from . import layer
 
 
 class NetWork:
-    def __init__(self, feature_size, hidden_size, label_size):
+    def __init__(self, feature_size, hidden_size, label_size, layers):
         # 生成层
         self.feature_size = feature_size
         self.hidden_size = hidden_size
         self.label_size = label_size
-        self.layers = []
+        self.layers = layers
         self.loss_layer = None
         self.params = []
         self.grads = []
+        self.load_params()
+        self.loss_layer = layer.Mse()
 
     def load_params(self):
         # 将所有的权重整理到列表中
@@ -65,24 +67,18 @@ class NetWork:
 
 
 class TwoLayerNet(NetWork):
-    def __init__(self, input_size, hidden_size, output_size):
-        super().__init__(input_size, hidden_size, output_size)
-        w1, b1, w2, b2 = self.init()
-        self.layers = [
+    def __init__(self, feature_size, hidden_size, label_size):
+        w1 = np.random.randn(feature_size, hidden_size)
+        b1 = np.random.randn(hidden_size)
+        w2 = np.random.randn(hidden_size, label_size)
+        b2 = np.random.randn(label_size)
+        layers = [
             layer.Affine(w1, b1),
             layer.ReLU(),
             layer.Affine(w2, b2)
         ]
-        self.load_params()
-        self.loss_layer = layer.Mse()
-
-    def init(self):
-        # 初始化权重和偏置
-        w1 = np.random.randn(self.feature_size, self.hidden_size)
-        b1 = np.random.randn(self.hidden_size)
-        w2 = np.random.randn(self.hidden_size, self.label_size)
-        b2 = np.random.randn(self.label_size)
-        return w1, b1, w2, b2
+        super().__init__(feature_size, hidden_size, label_size, layers)
+        self.layers = layers
 
 
 class SGD:

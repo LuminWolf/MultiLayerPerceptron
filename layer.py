@@ -62,3 +62,22 @@ class Mse(Layer):
         n = self.label.shape[0]
         grad = (2 / n) * (self.predicted - self.label)
         return grad
+
+
+class BatchNormalization(Layer):
+    def __init__(self):
+        super().__init__()
+        gama = None
+        beta = None
+        miub = None
+        sigmab = None
+        self.params.append([gama, beta])
+        self.out = None
+
+    def forward(self, x):
+        out = x
+        self.out = out
+        return out
+
+    def backward(self):
+        pass
