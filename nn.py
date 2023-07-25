@@ -2,7 +2,9 @@ import csv
 
 import numpy as np
 
+
 from . import layer
+
 
 
 class NetWork:
@@ -79,6 +81,8 @@ class TwoLayerNet(NetWork):
         ]
         super().__init__(feature_size, hidden_size, label_size, layers)
         self.layers = layers
+        self.load_params()
+        self.loss_layer = layer.Mse()
 
 
 class SGD:
