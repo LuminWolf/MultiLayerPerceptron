@@ -1,10 +1,8 @@
 import csv
 
 import numpy as np
-
-
 from . import layer
-
+from MultiLayerPerceptron import optimizer
 
 
 class NetWork:
@@ -45,8 +43,8 @@ class NetWork:
     def iteration(self, feature, label):
         loss = self.forward(feature, label)
         self.backward()
-        optimizer = SGD()
-        optimizer.update(self.params, self.grads)
+        optim = optimizer.SGD()
+        optim.update(self.params, self.grads)
         return loss
 
     def epoch(self, dataset, batchsize):
@@ -83,15 +81,6 @@ class TwoLayerNet(NetWork):
         self.layers = layers
         self.load_params()
         self.loss_layer = layer.Mse()
-
-
-class SGD:
-    def __init__(self, lr=0.01):
-        self.lr = lr
-
-    def update(self, params, grads):
-        for i in range(len(params)):
-            params[i] -= self.lr * grads[i]
 
 
 class DataSet:
@@ -165,16 +154,19 @@ def load(model, params_filepath):
     layers_shape = []
     for i in range(len(model.params)):
         layers_shape.append(np.shape(model.params[i]))
+
     # load layers
     layers = []
     row_index = 0
     for i in range(0, len(layers_shape), 2):
         shape = layers_shape[i]
         lay = []
-        for j in range(row_index, row_index+shape[0]+1):
+        lay_len = row_index+shape[0]+1
+        for j in range(row_index, lay_len):
             lay.append(raw_data[j])
         layers.append(np.array(lay, dtype=np.float32))
         row_index += shape[0]+1
+
     # load params
     params = []
     for i in range(len(layers)):
@@ -183,20 +175,3 @@ def load(model, params_filepath):
         params.append(weight)
         params.append(bias)
     model.params = params
-
-
-def example():
-    feature_size = 2  # 特征数量
-    label_size = 1  # 标签数量
-    batch_size = 10  # batch的大小
-    dataset_size = 100  # 数据集大小
-
-    model_1 = TwoLayerNet(feature_size, 3, label_size)
-
-    main_data = DataSet(np.random.randn(dataset_size, feature_size+label_size))
-    data_train, data_val = main_data.split()
-    model_1.learn(data_train, data_val, batch_size, 5)
-
-
-if __name__ == '__main__':
-    example()
